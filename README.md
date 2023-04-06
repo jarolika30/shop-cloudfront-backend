@@ -22,6 +22,9 @@ Evaluation criteria (70 points for covering all criteria)
 Done:
 
 +5 - Async/await is used in lambda functions
+
 +5 - ES6 modules are used for Product Service implementation
+
 +4 (All languages) - Lambda handlers (getProductsList, getProductsById) code is written not in 1 single module (file) and separated in codebase.
+
 +4 (All languages) - Main error scenarios are handled by API ("Product not found" error).
