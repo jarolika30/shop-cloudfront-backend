@@ -10,3 +10,10 @@ Evaluation criteria (70 points for covering all criteria)
 ### Endpoints:
   GET - https://j02ahsxjv4.execute-api.us-east-1.amazonaws.com/dev/products
   GET - https://j02ahsxjv4.execute-api.us-east-1.amazonaws.com/dev/products/{id}
+
+### Screenshots
+
+![image](https://user-images.githubusercontent.com/44402789/230286641-3689fd0d-1239-4e3c-ae16-51a8377e7142.png)
+
+![image](https://user-images.githubusercontent.com/44402789/230286545-b4c1731f-d4a2-494f-9804-ce283038ed8f.png)
+
