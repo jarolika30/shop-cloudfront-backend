@@ -1,6 +1,6 @@
 'use strict';
 
-const mockProducts = require('../data/products');
+import mockData from '../data/products';
 
 module.exports.getProductsList = async (event) => {
   return {
@@ -9,7 +9,7 @@ module.exports.getProductsList = async (event) => {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Credentials': true
     },
-    body: JSON.stringify(mockProducts)
+    body: JSON.stringify(mockData)
   };
 
   // Use this code if you don't use the http event with the LAMBDA-PROXY integration

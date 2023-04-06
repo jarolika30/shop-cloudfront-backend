@@ -1,4 +1,4 @@
-mockData = [
+const mockData = [
   {
     "count": 4,
     "description": "Varieties of layered chalcedony.",
@@ -57,4 +57,4 @@ mockData = [
   }
 ];
 
-module.exports = mockData;
+export default mockData;

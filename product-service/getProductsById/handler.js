@@ -1,10 +1,10 @@
 'use strict';
 
-const mockProducts = require('../data/products');
+import mockData from '../data/products';
 
 module.exports.getProductsById = async (event) => {
   const { id } = event.pathParameters;
-  const productItem = await mockProducts.find((product) => product.id === id);
+  const productItem = await mockData.find((product) => product.id === id);
 
   if (productItem) {
     return {
