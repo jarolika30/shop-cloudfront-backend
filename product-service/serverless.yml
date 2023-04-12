@@ -22,7 +22,7 @@ frameworkVersion: '3'
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs18.x
 
 # you can overwrite defaults here
   stage: dev
@@ -89,6 +89,14 @@ functions:
       - http:
           path: products/{id}
           method: get
+          cors:
+            origin: '*'
+  createProduct:
+    handler: createProduct/handler.createProduct
+    events:
+      - http:
+          path: products
+          method: post
           cors:
             origin: '*'
 resources:

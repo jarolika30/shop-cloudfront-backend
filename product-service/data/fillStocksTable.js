@@ -1,13 +1,11 @@
 'use strict';
 
-const AWS = require('aws-sdk');
-const mockProducts = require('./products');
+import populateTable from './populateTable';
 
-const dynamoDb = new AWS.DynamoDB.DocumentClient({
-  region: 'us-east-1'
-});
+import mockData from '../data/products';
 
-mockProducts.forEach((product) => {
+
+mockData.forEach((product) => {
   let params = {
     TableName: 'stocks',
     Item: {
@@ -16,13 +14,6 @@ mockProducts.forEach((product) => {
     },
   };
 
-  fillStocksTable(params);
+  populateTable(params);
 });
 
-async function fillStocksTable(item) {
-  try {
-    await dynamoDb.put(item).promise();
-  } catch (err) {
-    console.log(err);
-  }
-}
