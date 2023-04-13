@@ -10,7 +10,7 @@ const dDBDocClient = DynamoDBDocumentClient.from(dDBClient);
 
 const fetchProductsData = async () => {
   const params = {
-    TableName: process.env.ProductsTableName
+    TableName: process.env.PRODUCTS_TABLE_NAME
   };
   const scanCommand = new ScanCommand(params);
   try {
@@ -23,7 +23,7 @@ const fetchProductsData = async () => {
 
 const getProductStock = async (productId) => {
   const params = {
-    TableName: process.env.StocksTableName,
+    TableName: process.env.STOCKS_TABLE_NAME,
     Key: {
       product_id: { S: productId }
     }

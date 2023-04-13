@@ -20,6 +20,10 @@ service: product-service-staurova
 # Check out our docs for more details
 frameworkVersion: '3'
 
+custom:
+  tableNameProducts: products
+  tableNameStock: stocks
+
 provider:
   name: aws
   runtime: nodejs18.x
@@ -40,6 +44,9 @@ provider:
         - dynamodb:DeleteItem
       Resource:
         - arn:aws:dynamodb:${self:provider.region}:*:table/*
+  environment:
+    PRODUCTS_TABLE_NAME: ${self:custom.tableNameProducts}
+    STOCKS_TABLE_NAME: ${self:custom.tableNameStock}
 
 # you can add statements to the Lambda function's IAM Role here
 #  iam:
@@ -104,7 +111,7 @@ resources:
     Products:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: products
+        TableName: ${self:custom.tableNameProducts}
         AttributeDefinitions:
           - AttributeName: id
             AttributeType: S
@@ -117,7 +124,7 @@ resources:
     Stocks:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: stocks
+        TableName: ${self:custom.tableNameStock}
         AttributeDefinitions:
           - AttributeName: product_id
             AttributeType: S

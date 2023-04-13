@@ -9,7 +9,7 @@ const dDBDocClient = DynamoDBDocumentClient.from(dDBClient);
 
 const putItem = async (item) => {
   const params = {
-    TableName: process.env.ProductsTableName,
+    TableName: process.env.PRODUCTS_TABLE_NAME,
     Item: item
   };
 
