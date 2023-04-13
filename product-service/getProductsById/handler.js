@@ -53,7 +53,6 @@ const modifyProduct = async (productId) => {
     const product = await fetchProductData(productId);
     const productStock = await fetchProductStock(productId);
     product.count = productStock.count;
-    console.log(product);
 
     return product;
   } catch (err) {

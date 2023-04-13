@@ -52,6 +52,7 @@ const joinProductTables = async () => {
         return item;
       })
     );
+    console.log('modifiedProducts:', modifiedProducts);
     return modifiedProducts;
   } catch (error) {
     throw new Error(error);
