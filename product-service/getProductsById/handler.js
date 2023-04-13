@@ -4,7 +4,7 @@ const { DynamoDBClient, GetItemCommand } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient } = require('@aws-sdk/lib-dynamodb');
 const { unmarshall } = require('@aws-sdk/util-dynamodb');
 
-const dDBClient = new DynamoDBClient({ region: 'eu-central-1' });
+const dDBClient = new DynamoDBClient({ region: 'us-east-1' });
 const dDBDocClient = DynamoDBDocumentClient.from(dDBClient);
 
 const fetchProductData = async (productId) => {
@@ -14,7 +14,9 @@ const fetchProductData = async (productId) => {
       id: { S: productId }
     }
   };
+
   const getItemCommand = new GetItemCommand(params);
+
   try {
     const result = await dDBDocClient.send(getItemCommand);
     const unmarshalledItem = unmarshall(result.Item);
@@ -33,10 +35,13 @@ const fetchProductStock = async (productId) => {
     },
     ProjectionExpression: 'itemCount'
   };
+
   const getItemCommand = new GetItemCommand(params);
+
   try {
     const result = await dDBDocClient.send(getItemCommand);
     const unmarshalledItemStock = unmarshall(result.Item);
+
     return unmarshalledItemStock;
   } catch (error) {
     console.log(error);

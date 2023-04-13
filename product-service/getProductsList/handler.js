@@ -5,14 +5,17 @@ const {
   DynamoDBDocumentClient,
   ScanCommand
 } = require('@aws-sdk/lib-dynamodb');
-const dDBClient = new DynamoDBClient({ region: 'eu-central-1' });
+
+const dDBClient = new DynamoDBClient({ region: 'us-east-1' });
 const dDBDocClient = DynamoDBDocumentClient.from(dDBClient);
 
 const fetchProductsData = async () => {
   const params = {
     TableName: process.env.PRODUCTS_TABLE_NAME
   };
+
   const scanCommand = new ScanCommand(params);
+
   try {
     const result = await dDBDocClient.send(scanCommand);
     return result.Items;
@@ -28,7 +31,9 @@ const getProductStock = async (productId) => {
       product_id: { S: productId }
     }
   };
+
   const getItemCommand = new GetItemCommand(params);
+
   try {
     const result = await dDBDocClient.send(getItemCommand);
 
