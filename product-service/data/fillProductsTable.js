@@ -1,12 +1,12 @@
 'use strict';
 
-import populateTable from './populateTable';
+const { populateTable } = require('./populateTable');
 
-import mockData from '../data/products';
+const mockData = require('./products');
 
 mockData.forEach((product) => {
   let params = {
-    TableName: 'products',
+    TableName: process.env.PRODUCTS_TABLE_NAME,
     Item: {
       id: product.id,
       title: product.title,
