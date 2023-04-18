@@ -23,6 +23,8 @@ const putItem = async (item) => {
 };
 
 module.exports.createProduct = async (event) => {
+  console.log(event);
+
   if (event.body) {
     const { newProduct } = event.body;
 

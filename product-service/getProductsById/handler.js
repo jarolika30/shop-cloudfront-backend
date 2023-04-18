@@ -61,6 +61,8 @@ const modifyProduct = async (productId) => {
 };
 
 module.exports.getProductsById = async (event) => {
+  console.log(event);
+
   const { id } = event.pathParameters;
   const productItem = await modifyProduct(id);
 

@@ -52,7 +52,7 @@ const joinProductTables = async () => {
         return item;
       })
     );
-    console.log('modifiedProducts:', modifiedProducts);
+
     return modifiedProducts;
   } catch (error) {
     throw new Error(error);
@@ -60,6 +60,8 @@ const joinProductTables = async () => {
 };
 
 module.exports.getProductsList = async (event) => {
+  console.log(event);
+
   const products = await joinProductTables();
 
   return {
