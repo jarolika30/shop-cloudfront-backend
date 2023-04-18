@@ -20,14 +20,33 @@ service: product-service-staurova
 # Check out our docs for more details
 frameworkVersion: '3'
 
+custom:
+  tableNameProducts: products
+  tableNameStock: stocks
+
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs18.x
 
 # you can overwrite defaults here
   stage: dev
   region: us-east-1
   profile: 'sandx'
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - arn:aws:dynamodb:${self:provider.region}:*:table/*
+  environment:
+    PRODUCTS_TABLE_NAME: ${self:custom.tableNameProducts}
+    STOCKS_TABLE_NAME: ${self:custom.tableNameStock}
 
 # you can add statements to the Lambda function's IAM Role here
 #  iam:
@@ -79,6 +98,42 @@ functions:
           method: get
           cors:
             origin: '*'
+  createProduct:
+    handler: createProduct/handler.createProduct
+    events:
+      - http:
+          path: products
+          method: post
+          cors:
+            origin: '*'
+resources:
+  Resources:
+    Products:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableNameProducts}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+    Stocks:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tableNameStock}
+        AttributeDefinitions:
+          - AttributeName: product_id
+            AttributeType: S
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+        KeySchema:
+          - AttributeName: product_id
+            KeyType: HASH
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)

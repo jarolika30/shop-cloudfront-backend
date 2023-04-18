@@ -1,4 +1,4 @@
-const mockData = [
+mockData = [
   {
     "count": 4,
     "description": "Varieties of layered chalcedony.",
@@ -15,8 +15,8 @@ const mockData = [
   },
   {
     "count": 7,
-    "description": "",
-    "id": "It consists mainly of minerals of the serpentine group and an admixture of carbonates, sometimes garnet, olivine.",
+    "description": "It consists mainly of minerals of the serpentine group and an admixture of carbonates, sometimes garnet, olivine.",
+    "id": "7567ec4b-b10c-48c5-9345-fc73c48a80ac",
     "price": 10,
     "title": "Serpentine"
   },
@@ -57,4 +57,5 @@ const mockData = [
   }
 ];
 
-export default mockData;
+module.exports = mockData;
+
