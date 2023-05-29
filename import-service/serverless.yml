@@ -20,12 +20,27 @@ service: import-service-staurova
 # Check out our docs for more details
 frameworkVersion: '3'
 
+custom:
+  client:
+    bucketName: import-service-staurova
+
 provider:
   name: aws
   runtime: nodejs18.x
   stage: dev
   region: us-east-1
   profile: 'sandx'
+
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action: 's3:ListBucket'
+      Resource:
+        - 'arn:aws:s3:::import-service-staurova'
+    - Effect: 'Allow'
+      Action:
+        - 's3:*'
+      Resource:
+        - 'arn:aws:s3:::import-service-staurova/*''
 
 # you can overwrite defaults here
 #  stage: dev
@@ -62,8 +77,27 @@ provider:
 #    - include-me-dir/**
 
 functions:
-  hello:
-    handler: handler.hello
+  importProductsFile:
+    handler: importProductsFile/handler.importProductsFile
+    events:
+      - http:
+          path: import
+          method: get
+          request:
+            parameters:
+              querystrings:
+                name: true
+          cors:
+            origin: '*'
+  importFileParser:
+    handler: importFileParser/handler.importFileParser
+    events:
+      - s3:
+          bucket: ${self:custom.client.bucketName}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details

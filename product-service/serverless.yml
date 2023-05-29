@@ -116,8 +116,8 @@ resources:
           - AttributeName: id
             AttributeType: S
         ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
         KeySchema:
           - AttributeName: id
             KeyType: HASH
@@ -129,8 +129,8 @@ resources:
           - AttributeName: product_id
             AttributeType: S
         ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
         KeySchema:
           - AttributeName: product_id
             KeyType: HASH
