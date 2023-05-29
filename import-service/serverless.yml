@@ -40,7 +40,7 @@ provider:
       Action:
         - 's3:*'
       Resource:
-        - 'arn:aws:s3:::import-service-staurova/*''
+        - 'arn:aws:s3:::import-service-staurova/*'
 
 # you can overwrite defaults here
 #  stage: dev
