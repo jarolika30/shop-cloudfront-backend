@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: product-service-staurova
+service: import-service-staurova
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -21,29 +21,34 @@ service: product-service-staurova
 frameworkVersion: '3'
 
 custom:
-  tableNameProducts: products
-  tableNameStock: stocks
+  client:
+    bucketName: import-service-staurova
 
 provider:
   name: aws
   runtime: nodejs18.x
-
-# you can overwrite defaults here
   stage: dev
   region: us-east-1
   profile: 'sandx'
-  
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action: 'sqs:*'
+
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action: 's3:ListBucket'
+      Resource:
+        - 'arn:aws:s3:::import-service-staurova'
+    - Effect: 'Allow'
+      Action:
+        - 's3:*'
+      Resource:
+        - 'arn:aws:s3:::import-service-staurova/*'
+      Action:
+            - 'sqs:*'
           Resource:
-            - Fn::GetAtt: [catalogItemsQueue, Arn]
-        - Effect: Allow
-          Action: 'sns:*'
-          Resource:
-            - Ref: createProductTopic
+            - 'arn:aws:sqs:us-east-1:241918472493:catalogItemsQueue/*'
+
+# you can overwrite defaults here
+#  stage: dev
+#  region: us-east-1
 
 # you can add statements to the Lambda function's IAM Role here
 #  iam:
@@ -76,98 +81,34 @@ provider:
 #    - include-me-dir/**
 
 functions:
-  getProductsList:
-    handler: getProductsList/handler.getProductsList
+  importProductsFile:
+    handler: importProductsFile/handler.importProductsFile
+    events:
+      - http:
+          path: import
+          method: get
+          request:
+            parameters:
+              querystrings:
+                name: true
+          cors:
+            origin: '*'
+  importFileParser:
+    handler: importFileParser/handler.importFileParser
+    events:
+      - s3:
+          bucket: ${self:custom.client.bucketName}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: uploaded/
+          existing: true
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
-    events:
-      - http:
-          path: products
-          method: get
-          cors:
-            origin: '*'
-  getProductsById:
-    handler: getProductsById/handler.getProductsById
-    events:
-      - http:
-          path: products/{id}
-          method: get
-          cors:
-            origin: '*'
-  createProduct:
-    handler: createProduct/handler.createProduct
-    events:
-      - http:
-          path: products
-          method: post
-          cors:
-            origin: '*'
-  catalogBatchProcess:
-    handler: catalogBatchProcess/handler.catalogBatchProcess
-    events:
-      - sqs:
-          arn:
-            Fn::GetAtt:
-              - catalogItemsQueue
-              - Arn
-          batchSize: 5
-resources:
-  Resources:
-    Products:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.tableNameProducts}
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-    Stocks:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.tableNameStock}
-        AttributeDefinitions:
-          - AttributeName: product_id
-            AttributeType: S
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        KeySchema:
-          - AttributeName: product_id
-            KeyType: HASH
-    catalogItemsQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: catalogItemsQueue
-        RedrivePolicy:
-          deadLetterTargetArn: !GetAtt catalogItemsQueueDLQueue.Arn
-          maxReceiveCount: 3
-    catalogItemsQueueDLQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: catalogItemsQueueDLQueue
-        MessageRetentionPeriod: 86100
-    createProductTopic:
-      Type: AWS::SNS::Topic
-      Properties:
-        TopicName: createProductTopic
-        Subscription:
-          - Endpoint:
-              Fn::GetAtt:
-                - catalogItemsQueue
-                - Arn
-            Protocol: sqs
-    createProductSubscription:
-      Type: AWS::SNS::Subscription
-      Properties:
-        Protocol: email
-        Endpoint: ${env:EMAIL}
-        TopicArn: !Ref createProductTopic
+#    events:
+#      - httpApi:
+#          path: /users/create
+#          method: get
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
