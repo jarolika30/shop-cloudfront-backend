@@ -32,21 +32,18 @@ provider:
   stage: dev
   region: us-east-1
   profile: 'sandx'
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:DescribeTable
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource:
-        - arn:aws:dynamodb:${self:provider.region}:*:table/*
-  environment:
-    PRODUCTS_TABLE_NAME: ${self:custom.tableNameProducts}
-    STOCKS_TABLE_NAME: ${self:custom.tableNameStock}
+  
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: 'sqs:*'
+          Resource:
+            - Fn::GetAtt: [catalogItemsQueue, Arn]
+        - Effect: Allow
+          Action: 'sns:*'
+          Resource:
+            - Ref: createProductTopic
 
 # you can add statements to the Lambda function's IAM Role here
 #  iam:
@@ -106,6 +103,15 @@ functions:
           method: post
           cors:
             origin: '*'
+  catalogBatchProcess:
+    handler: catalogBatchProcess/handler.catalogBatchProcess
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - catalogItemsQueue
+              - Arn
+          batchSize: 5
 resources:
   Resources:
     Products:
@@ -134,6 +140,34 @@ resources:
         KeySchema:
           - AttributeName: product_id
             KeyType: HASH
+    catalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueue
+        RedrivePolicy:
+          deadLetterTargetArn: !GetAtt catalogItemsQueueDLQueue.Arn
+          maxReceiveCount: 3
+    catalogItemsQueueDLQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: catalogItemsQueueDLQueue
+        MessageRetentionPeriod: 86100
+    createProductTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: createProductTopic
+        Subscription:
+          - Endpoint:
+              Fn::GetAtt:
+                - catalogItemsQueue
+                - Arn
+            Protocol: sqs
+    createProductSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: email
+        Endpoint: ${env:EMAIL}
+        TopicArn: !Ref createProductTopic
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
