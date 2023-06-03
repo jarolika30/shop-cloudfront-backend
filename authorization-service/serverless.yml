@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: product-service-staurova
+service: authorization-service-staurova
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -20,30 +20,32 @@ service: product-service-staurova
 # Check out our docs for more details
 frameworkVersion: '3'
 
-custom:
-  tableNameProducts: products
-  tableNameStock: stocks
+plugins:
+  - serverless-dotenv-plugin
 
 provider:
   name: aws
   runtime: nodejs18.x
-
-# you can overwrite defaults here
   stage: dev
   region: us-east-1
   profile: 'sandx'
-  
-  iam:
-    role:
-      statements:
-        - Effect: Allow
-          Action: 'sqs:*'
-          Resource:
-            - Fn::GetAtt: [catalogItemsQueue, Arn]
-        - Effect: Allow
-          Action: 'sns:*'
-          Resource:
-            - Ref: createProductTopic
+
+  functions:
+  basicAuthorizer:
+    handler: basicAuthorizer/handler.basicAuthorizer
+    environment:
+      USER_PASSWORD: TEST_PASSWORD
+    events:
+      - http:
+        path: /
+        method: any
+        authorizer:
+          name: basicAuthorizer
+          type: TOKEN
+
+# you can overwrite defaults here
+#  stage: dev
+#  region: us-east-1
 
 # you can add statements to the Lambda function's IAM Role here
 #  iam:
@@ -75,99 +77,14 @@ provider:
 #    - include-me.js
 #    - include-me-dir/**
 
-functions:
-  getProductsList:
-    handler: getProductsList/handler.getProductsList
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
-    events:
-      - http:
-          path: products
-          method: get
-          cors:
-            origin: '*'
-  getProductsById:
-    handler: getProductsById/handler.getProductsById
-    events:
-      - http:
-          path: products/{id}
-          method: get
-          cors:
-            origin: '*'
-  createProduct:
-    handler: createProduct/handler.createProduct
-    events:
-      - http:
-          path: products
-          method: post
-          cors:
-            origin: '*'
-  catalogBatchProcess:
-    handler: catalogBatchProcess/handler.catalogBatchProcess
-    events:
-      - sqs:
-          arn:
-            Fn::GetAtt:
-              - catalogItemsQueue
-              - Arn
-          batchSize: 5
-resources:
-  Resources:
-    Products:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.tableNameProducts}
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-    Stocks:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:custom.tableNameStock}
-        AttributeDefinitions:
-          - AttributeName: product_id
-            AttributeType: S
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        KeySchema:
-          - AttributeName: product_id
-            KeyType: HASH
-    catalogItemsQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: catalogItemsQueue
-        RedrivePolicy:
-          deadLetterTargetArn: !GetAtt catalogItemsQueueDLQueue.Arn
-          maxReceiveCount: 3
-    catalogItemsQueueDLQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: catalogItemsQueueDLQueue
-        MessageRetentionPeriod: 86100
-    createProductTopic:
-      Type: AWS::SNS::Topic
-      Properties:
-        TopicName: createProductTopic
-        Subscription:
-          - Endpoint:
-              Fn::GetAtt:
-                - catalogItemsQueue
-                - Arn
-            Protocol: sqs
-    createProductSubscription:
-      Type: AWS::SNS::Subscription
-      Properties:
-        Protocol: email
-        Endpoint: ${env:EMAIL}
-        TopicArn: !Ref createProductTopic
+#    events:
+#      - httpApi:
+#          path: /users/create
+#          method: get
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
