@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: import-service-staurova
+service: authorization-service-staurova
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -20,9 +20,8 @@ service: import-service-staurova
 # Check out our docs for more details
 frameworkVersion: '3'
 
-custom:
-  client:
-    bucketName: import-service-staurova
+plugins:
+  - serverless-dotenv-plugin
 
 provider:
   name: aws
@@ -31,20 +30,18 @@ provider:
   region: us-east-1
   profile: 'sandx'
 
-  iamRoleStatements:
-    - Effect: 'Allow'
-      Action: 's3:ListBucket'
-      Resource:
-        - 'arn:aws:s3:::import-service-staurova'
-    - Effect: 'Allow'
-      Action:
-        - 's3:*'
-      Resource:
-        - 'arn:aws:s3:::import-service-staurova/*'
-      Action:
-            - 'sqs:*'
-          Resource:
-            - 'arn:aws:sqs:us-east-1:{241918472493}:catalogItemsQueue/*'
+  functions:
+  basicAuthorizer:
+    handler: basicAuthorizer/handler.basicAuthorizer
+    environment:
+      USER_PASSWORD: TEST_PASSWORD
+    events:
+      - http:
+        path: /
+        method: any
+        authorizer:
+          name: basicAuthorizer
+          type: TOKEN
 
 # you can overwrite defaults here
 #  stage: dev
@@ -80,31 +77,7 @@ provider:
 #    - include-me.js
 #    - include-me-dir/**
 
-functions:
-  importProductsFile:
-    handler: importProductsFile/handler.importProductsFile
-    events:
-      - http:
-          path: import
-          method: get
-          request:
-            parameters:
-              querystrings:
-                name: true
-          cors:
-            origin: '*'
-          authorizer:
-            arn: arn:aws:lambda:us-east-1:{241918472493}:function:authorization-service-dev-staurova
-            type: token
-  importFileParser:
-    handler: importFileParser/handler.importFileParser
-    events:
-      - s3:
-          bucket: ${self:custom.client.bucketName}
-          event: s3:ObjectCreated:*
-          rules:
-            - prefix: uploaded/
-          existing: true
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
