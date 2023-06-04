@@ -10,7 +10,7 @@ module.exports.catalogBatchProcess = async (event) => {
     const itemPromises = productsData.map(async (item) => {
       const snsParams = {
         Message: JSON.stringify(item),
-        TopicArn: process.env.PRODUCTS_TABLE_NAME
+        TopicArn: 'arn:aws:sns:us-east-1:735880260393:createProductTopic'
       };
       try {
         const apiUrl =
