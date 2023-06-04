@@ -21,9 +21,6 @@ service: authorization-service-staurova
 frameworkVersion: '3'
 useDotenv: true
 
-plugins:
-  - serverless-dotenv-plugin
-
 provider:
   name: aws
   runtime: nodejs18.x
