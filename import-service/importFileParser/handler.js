@@ -6,11 +6,7 @@ const { SQSClient, SendMessageCommand } = require('@aws-sdk/client-sqs');
 const s3Client = new S3Client({ region: 'us-east-1' });
 const sqsClient = new SQSClient({ region: 'us-east-1' });
 const url =
-<<<<<<< HEAD
-  'https://sqs.us-east-1.amazonaws.com/{241918472493}/catalogItemsQueue';
-=======
   'https://sqs.us-east-1.amazonaws.com/735880260393/catalogItemsQueue';
->>>>>>> task-6
 
 const sendToSqs = async (data) => {
   console.log(data);
