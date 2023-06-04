@@ -33,18 +33,14 @@ provider:
 
   iamRoleStatements:
     - Effect: 'Allow'
-      Action: 's3:ListBucket'
-      Resource:
-        - 'arn:aws:s3:::import-service-staurova'
-    - Effect: 'Allow'
-      Action:
-        - 's3:*'
+      Action: 's3:*'
       Resource:
         - 'arn:aws:s3:::import-service-staurova/*'
+    - Effect: 'Allow'
       Action:
-            - 'sqs:*'
-          Resource:
-            - 'arn:aws:sqs:us-east-1:735880260393:catalogItemsQueue/*'
+        - 'sqs:*'
+      Resource:
+        - 'arn:aws:sqs:us-east-1:735880260393:catalogItemsQueue/*'
 
 # you can overwrite defaults here
 #  stage: dev
