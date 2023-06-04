@@ -29,17 +29,17 @@ provider:
   profile: 'sandx'
 
   functions:
-  basicAuthorizer:
-    handler: basicAuthorizer/handler.basicAuthorizer
-    environment:
-      USER_PASSWORD: TEST_PASSWORD
-    events:
-      - http:
-        path: /
-        method: any
-        authorizer:
-          name: basicAuthorizer
-          type: TOKEN
+    basicAuthorizer:
+      handler: basicAuthorizer/handler.basicAuthorizer
+      environment:
+        USER_PASSWORD: TEST_PASSWORD
+      events:
+        - http:
+          path: /
+          method: any
+          authorizer:
+            name: basicAuthorizer
+            type: TOKEN
 
 # you can overwrite defaults here
 #  stage: dev
