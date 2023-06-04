@@ -44,7 +44,7 @@ provider:
       Action:
             - 'sqs:*'
           Resource:
-            - 'arn:aws:sqs:us-east-1:241918472493:catalogItemsQueue/*'
+            - 'arn:aws:sqs:us-east-1:735880260393:catalogItemsQueue/*'
 
 # you can overwrite defaults here
 #  stage: dev
